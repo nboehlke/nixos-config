@@ -8,6 +8,7 @@
   imports =
     [ # Include the results of the hardware scan.
 	./nextcloud.nix
+	./home-assistant.nix
     ];
 
  # This configuration worked on 09-03-2021 nixos-unstable @ commit 102eb68ceec
@@ -50,12 +51,18 @@
     git
   ];
 
+ 
   #start own config
+  
+  systemd.services.cfdyndns.startAt = lib.mkForce "*:0/5";
+
+  time.timeZone = "Europe/Berlin";
 
   services.openssh = {
     enable = true; 
     permitRootLogin = "no";
-  };
+    ports = [4242];
+ };
 
   fileSystems."/data" = { 
     device = "/dev/disk/by-uuid/753953c6-b9f3-60f0-ef69-aa32dea6fab6";
@@ -69,6 +76,7 @@
     records = [
       "home.niklas-boehlke.de"
       "cloud.niklas-boehlke.de"
+      "office.niklas-boehlke.de"
     ];
   };
 
@@ -144,6 +152,10 @@
     allowUnfree = true;
   };
   powerManagement.cpuFreqGovernor = "ondemand";
+  
+  system.autoUpgrade.enable = true;
+  system.autoUpgrade.dates = "Mon *-*-* 03:00:00";
+  system.autoUpgrade.allowReboot = true;
   system.stateVersion = "21.05";
   #swapDevices = [ { device = "/swapfile"; size = 3072; } ];
   
